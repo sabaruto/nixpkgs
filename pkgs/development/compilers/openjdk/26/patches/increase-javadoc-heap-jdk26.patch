@@ -1,0 +1,12 @@
+--- a/make/Docs.gmk	2026-04-08 14:43:06.765198522 +0200
++++ b/make/Docs.gmk	2026-04-08 14:43:27.890301990 +0200
+@@ -294,7 +294,8 @@ define SetupApiDocsGenerationBody
+   $1_INDIRECT_EXPORTS := $$(call FindTransitiveIndirectDepsForModules, $$($1_MODULES))
+   $1_ALL_MODULES := $$(sort $$($1_MODULES) $$($1_INDIRECT_EXPORTS))
+
+-  $1_JAVA_ARGS := -Dextlink.spec.version=$$(VERSION_SPECIFICATION)
++  $1_JAVA_ARGS := -Dextlink.spec.version=$$(VERSION_SPECIFICATION) \
++    -Djspec.version=$$(VERSION_SPECIFICATION) -Xmx1
+
+   ifeq ($$(ENABLE_FULL_DOCS), true)
+     $1_SEALED_GRAPHS_DIR := $$(SUPPORT_OUTPUTDIR)/docs/$1-sealed-graphs

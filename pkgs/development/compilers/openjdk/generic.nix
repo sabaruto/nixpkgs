@@ -77,6 +77,7 @@
   temurin-bin-17,
   temurin-bin-21,
   temurin-bin-25,
+  temurin-bin-26,
   jdk-bootstrap ?
     {
       "8" = temurin-bin-8.__spliced.buildBuild or temurin-bin-8;
@@ -84,6 +85,7 @@
       "17" = temurin-bin-17.__spliced.buildBuild or temurin-bin-17;
       "21" = temurin-bin-21.__spliced.buildBuild or temurin-bin-21;
       "25" = temurin-bin-25.__spliced.buildBuild or temurin-bin-25;
+      "26" = temurin-bin-26.__spliced.buildBuild or temurin-bin-26;
     }
     .${featureVersion},
 }:
@@ -100,6 +102,7 @@ let
   atLeast21 = lib.versionAtLeast featureVersion "21";
   atLeast23 = lib.versionAtLeast featureVersion "23";
   atLeast25 = lib.versionAtLeast featureVersion "25";
+  atLeast26 = lib.versionAtLeast featureVersion "26";
 
   tagPrefix = if atLeast11 then "jdk-" else "jdk";
   version = lib.removePrefix "refs/tags/${tagPrefix}" source.src.rev;
@@ -143,6 +146,18 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [
     (
+      if atLeast26 then
+        ./26/patches/read-truststore-from-env-jdk26.patch
+      else if atLeast25 then
+        ./25/patches/read-truststore-from-env-jdk25.patch
+      else if atLeast11 then
+        ./11/patches/read-truststore-from-env-jdk10.patch
+      else
+        ./8/patches/read-truststore-from-env-jdk8.patch
+    )
+  ]
+  ++ lib.optionals (!atLeast26) [
+    (
       if atLeast25 then
         ./25/patches/fix-java-home-jdk25.patch
       else if atLeast21 then
@@ -151,14 +166,6 @@ stdenv.mkDerivation (finalAttrs: {
         ./11/patches/fix-java-home-jdk10.patch
       else
         ./8/patches/fix-java-home-jdk8.patch
-    )
-    (
-      if atLeast25 then
-        ./25/patches/read-truststore-from-env-jdk25.patch
-      else if atLeast11 then
-        ./11/patches/read-truststore-from-env-jdk10.patch
-      else
-        ./8/patches/read-truststore-from-env-jdk8.patch
     )
   ]
   ++ lib.optionals (!atLeast23) [
@@ -171,7 +178,9 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals atLeast11 [
     (
-      if atLeast17 then
+      if atLeast26 then
+        ./26/patches/increase-javadoc-heap-jdk26.patch
+      else if atLeast17 then
         ./17/patches/increase-javadoc-heap-jdk13.patch
       else
         ./11/patches/increase-javadoc-heap.patch

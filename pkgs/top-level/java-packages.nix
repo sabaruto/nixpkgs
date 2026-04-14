@@ -54,6 +54,7 @@ in
       openjdk17 = mkOpenjdk "17";
       openjdk21 = mkOpenjdk "21";
       openjdk25 = mkOpenjdk "25";
+      openjdk26 = mkOpenjdk "26";
 
       # Legacy aliases
       openjdk8-bootstrap = temurin-bin.jdk-8;
