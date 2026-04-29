@@ -590,7 +590,16 @@ stdenv.mkDerivation (finalAttrs: {
           "keytool"
       } ${cacert}/etc/ssl/certs/ca-bundle.crt
     ''
-  );
+  ) + lib.optionalString (atLeast26) (''
+    cd $out/lib/openjdk/lib/security/
+    rm cacerts
+    ${jre-generate-cacerts} ${
+      if stdenv.buildPlatform.canExecute stdenv.hostPlatform then
+        "$out/bin/keytool"
+      else
+        "keytool"
+    } ${cacert}/etc/ssl/certs/ca-bundle.crt
+  '');
 
   preFixup =
     # Set JAVA_HOME automatically.
